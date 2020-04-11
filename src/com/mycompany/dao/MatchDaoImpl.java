@@ -287,7 +287,23 @@ public class MatchDaoImpl implements MatchDao {
 
 	@Override
 	public void modifier(Match match) {
-		// TODO Auto-generated method stub
+		Connection connexion=null;
+		PreparedStatement statement=null;
+		
+		try {
+			connexion=daoFactory.getConnection();
+			String strSql="Update match_tennis SET id_epreuve=?,id_vainqueur=?,id_finaliste=? where id=?";
+			statement=connexion.prepareStatement(strSql);
+			statement.setInt(1, match.getId_Epreuve());
+			statement.setInt(2, match.getId_Vainqueur());
+			statement.setInt(3, match.getId_Finaliste());
+			statement.setInt(4, match.getId());
+			
+			statement.executeUpdate();
+			
+		}catch (Exception exception){
+			throw new RuntimeException(exception);
+		}
 
 	}
 

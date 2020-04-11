@@ -200,10 +200,10 @@ public class ModifierMatch extends HttpServlet {
 		//on souhaute récupérer l'idepreuve correspondant au match pour pouvoir modifier la ligne epreuve dans la table epreuve
 		Match matchSelected=matchDao.lecture(idMatch);
 		
-		//on récupère l'idEpreuve grâce à l'objet match constitué à partir de l'id match récupéré, on lit la ligen dans la table match et on récupère l'idEpreuve
+		//on récupère l'idEpreuve grâce à l'objet match constitué à partir de l'id match récupéré, on lit la ligne dans la table match et on récupère l'idEpreuve
 		int idEpreuve=matchSelected.getId_Epreuve();
 		
-		
+		//on récupère le contenu de tous les champs correspondant à la table epreuve pour modifier la ligne epreuve correspondante au macth sélectionné
 		String idTournoi1=request.getParameter("nomtournoi");
 		int idTournoi=Integer.parseInt(idTournoi1);
 		
@@ -214,9 +214,24 @@ public class ModifierMatch extends HttpServlet {
 		
 		String type=request.getParameter("type");
 		
-		
+		//on crée notre objet epreuve avec les valeurs modifiées par l'utilisateur
 		Epreuve epreuve=new Epreuve(idEpreuve,annee,type,idTournoi);
+		//on update la ligne epreuve modifiée avec les novuelles valeurs rentrées par l'utilisateur via la méthode modifier de daoImpl
 		epreuveDao.modifier(epreuve);
+		
+		//next step : update la ligne du match sélectionné avec les joueurs rentrés par l'utilisateur : correspond aux champs id finaliste et idvainqueur de la table match_tennis
+		
+		//on récupere les id correspondant aux joueurs sélectionnés par l'utilisateur grâce à value="${joueur.id}" dans la jsp
+		String tempidVainqueur=request.getParameter("vainqueur");
+		int idVainqueur=Integer.parseInt(tempidVainqueur);
+		
+		String tempidFinaliste=request.getParameter("finaliste");
+		int idFinaliste=Integer.parseInt(tempidFinaliste);
+		
+		Match match=new Match(idMatch,idEpreuve,idVainqueur,idFinaliste);
+		matchDao.modifier(match);
+		
+		
 		
 		response.sendRedirect("/Appljoueur/listmatch");
 		
