@@ -64,7 +64,60 @@ public class ScoreDaoImpl implements ScoreDao{
 
 	@Override
 	public void modifier(Score score) {
-		// TODO Auto-generated method stub
+		Connection connexion = null;
+		PreparedStatement statement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			// requete pour ajouter : insert into nomdelatable (nomcolonne,nomcolonne...) values (?,?,?), ? : parametres à remplacer avec un setType(numeroParam,objet.getType)
+			String strSql = "";
+			
+			//en focntion du nombre de sets renseignés on va faire une requete différente car on ne peut pas update avec des getSet avec la valeur null
+			//on attribue donc notre variable strSql en fonction de la requete voulue
+			if(score.getSet3()==null) {
+				strSql="UPDATE score_vainqueur SET set_1=?, set_2=? where id_match=?";
+			}else if(score.getSet4()==null) {
+				strSql="UPDATE score_vainqueur SET set_1=?, set_2=?, set_3=? where id_match=?";
+			}else if(score.getSet5()==null){
+				strSql="UPDATE score_vainqueur SET set_1=?, set_2=?, set_3=?,set_4=? where id_match=?";
+			}else {
+				strSql = "UPDATE score_vainqueur SET set_1=?, set_2=?, set_3=?, set_4=?, set_5=? where id_match=?";
+			}
+			
+			//on effectue notre demande de reqûete avec la varibale strSql attribuée avec la bonne requete en fonction des if précédents
+			statement = connexion.prepareStatement(strSql);
+
+			//ce sont les valeurs qui sont obligatoirement modifiées dans la bdd car on joue minimum 2 sets (champs en requiered dans la jsp
+			statement.setInt(1,score.getSet1());
+			statement.setInt(2,score.getSet2());
+			
+			//en fonction du nombre de sets renseignés le numéro du parametre id_match va être décalé donc on fait un if pour gérer cela
+			if(score.getSet3()==null) {
+				statement.setInt(3, score.getIdMatch());
+			}
+			
+			else if(score.getSet4()==null) {
+				statement.setInt(3, score.getSet3());
+				statement.setInt(4, score.getIdMatch());
+			}
+			else if(score.getSet5()==null) {
+				statement.setInt(3, score.getSet3());
+				statement.setInt(4, score.getSet4());
+				statement.setInt(5,score.getIdMatch());
+			}
+				
+			else if(!(score.getSet5()==null)) {
+				statement.setInt(3, score.getSet3());
+				statement.setInt(4, score.getSet4());
+				statement.setInt(5, score.getSet5());
+				statement.setInt(6,score.getIdMatch());
+			}
+				
+			statement.executeUpdate();
+
+		} catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
 		
 	}
 

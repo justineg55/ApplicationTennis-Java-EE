@@ -70,9 +70,10 @@ public class ModifierMatch extends HttpServlet {
 		String tempIdMatch = request.getParameter("idmatch");
 		// on la transforme en int
 		int idMatch = Integer.parseInt(tempIdMatch);
-		//on enferme cette valeur récupérée dans une variable afin de la récupérer quand on en aura besoin en faisant le submit et en appelant le doPost
-		request.setAttribute("idMatch",idMatch );
-		System.out.println("idmatch récupéré dans le doGet" +idMatch);
+		// on enferme cette valeur récupérée dans une variable afin de la récupérer
+		// quand on en aura besoin en faisant le submit et en appelant le doPost
+		request.setAttribute("idMatch", idMatch);
+		System.out.println("idmatch récupéré dans le doGet" + idMatch);
 
 		// avec l'idmatch récupéré on veut récupérer toute la ligne correspondante à cet
 		// id dans la table match, on enferme cette ligne dans un objet Match retourné
@@ -178,8 +179,8 @@ public class ModifierMatch extends HttpServlet {
 			request.setAttribute("nbjeuxSet4Vainqueur", nbJeuxSet5Vainqueur);
 			request.setAttribute("nbjeuxSet4Finaliste", nbJeuxSet5Finaliste);
 		}
-		
-		//on affiche la vue mise à jour avec les variables
+
+		// on affiche la vue mise à jour avec les variables
 		this.getServletContext().getRequestDispatcher("/WEB-INF/modifiermatch.jsp").forward(request, response);
 	}
 
@@ -189,53 +190,159 @@ public class ModifierMatch extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
-		//on récupère l'id du match sélectionné pour modification grâce à la variable créée dans le doGet value="${idMatch}"
+
+		// on récupère l'id du match sélectionné pour modification grâce à la variable
+		// créée dans le doGet value="${idMatch}"
 		String tempIdMatch = request.getParameter("idmatch");
 		// on la transforme en int
 		int idMatch = Integer.parseInt(tempIdMatch);
-		System.out.println("idmatch récupéré dans le doPost en int" +idMatch);
-		
-		System.out.println("id macth est" +idMatch);
-		//on souhaute récupérer l'idepreuve correspondant au match pour pouvoir modifier la ligne epreuve dans la table epreuve
-		Match matchSelected=matchDao.lecture(idMatch);
-		
-		//on récupère l'idEpreuve grâce à l'objet match constitué à partir de l'id match récupéré, on lit la ligne dans la table match et on récupère l'idEpreuve
-		int idEpreuve=matchSelected.getId_Epreuve();
-		
-		//on récupère le contenu de tous les champs correspondant à la table epreuve pour modifier la ligne epreuve correspondante au macth sélectionné
-		String idTournoi1=request.getParameter("nomtournoi");
-		int idTournoi=Integer.parseInt(idTournoi1);
-		
-		
-		String annee1=request.getParameter("annee");
-		int annee=Integer.parseInt(annee1);
-		
-		
-		String type=request.getParameter("type");
-		
-		//on crée notre objet epreuve avec les valeurs modifiées par l'utilisateur
-		Epreuve epreuve=new Epreuve(idEpreuve,annee,type,idTournoi);
-		//on update la ligne epreuve modifiée avec les novuelles valeurs rentrées par l'utilisateur via la méthode modifier de daoImpl
+		System.out.println("idmatch récupéré dans le doPost en int" + idMatch);
+
+		System.out.println("id macth est" + idMatch);
+		// on souhaute récupérer l'idepreuve correspondant au match pour pouvoir
+		// modifier la ligne epreuve dans la table epreuve
+		Match matchSelected = matchDao.lecture(idMatch);
+
+		// on récupère l'idEpreuve grâce à l'objet match constitué à partir de l'id
+		// match récupéré, on lit la ligne dans la table match et on récupère
+		// l'idEpreuve
+		int idEpreuve = matchSelected.getId_Epreuve();
+
+		// on récupère le contenu de tous les champs correspondant à la table epreuve
+		// pour modifier la ligne epreuve correspondante au macth sélectionné
+		String idTournoi1 = request.getParameter("nomtournoi");
+		int idTournoi = Integer.parseInt(idTournoi1);
+
+		String annee1 = request.getParameter("annee");
+		int annee = Integer.parseInt(annee1);
+
+		String type = request.getParameter("type");
+
+		// on crée notre objet epreuve avec les valeurs modifiées par l'utilisateur
+		Epreuve epreuve = new Epreuve(idEpreuve, annee, type, idTournoi);
+		// on update la ligne epreuve modifiée avec les novuelles valeurs rentrées par
+		// l'utilisateur via la méthode modifier de daoImpl
 		epreuveDao.modifier(epreuve);
-		
-		//next step : update la ligne du match sélectionné avec les joueurs rentrés par l'utilisateur : correspond aux champs id finaliste et idvainqueur de la table match_tennis
-		
-		//on récupere les id correspondant aux joueurs sélectionnés par l'utilisateur grâce à value="${joueur.id}" dans la jsp
-		String tempidVainqueur=request.getParameter("vainqueur");
-		int idVainqueur=Integer.parseInt(tempidVainqueur);
-		
-		String tempidFinaliste=request.getParameter("finaliste");
-		int idFinaliste=Integer.parseInt(tempidFinaliste);
-		
-		Match match=new Match(idMatch,idEpreuve,idVainqueur,idFinaliste);
+
+		// next step : update la ligne du match sélectionné avec les joueurs rentrés par
+		// l'utilisateur : correspond aux champs id finaliste et idvainqueur de la table
+		// match_tennis
+
+		// on récupere les id correspondant aux joueurs sélectionnés par l'utilisateur
+		// grâce à value="${joueur.id}" dans la jsp
+		String tempidVainqueur = request.getParameter("vainqueur");
+		int idVainqueur = Integer.parseInt(tempidVainqueur);
+
+		String tempidFinaliste = request.getParameter("finaliste");
+		int idFinaliste = Integer.parseInt(tempidFinaliste);
+
+		Match match = new Match(idMatch, idEpreuve, idVainqueur, idFinaliste);
 		matchDao.modifier(match);
-		
-		
-		
+
+		// next step : modifier la ligne de la table score avec l'idMatch récupéré et
+		// update la table score avec les scores modifiés
+		// on récupère les scores sous forme de jeux on doit donc transformer les scores
+		// récupérés pour les adapter au format dans lequel ils sont dans la bdd
+
+		// on récupère les valeurs modifiées par l'utilisateur
+		String tempset1Vainqueur = request.getParameter("set1vainqueur");
+		Integer set1Vainqueur = Integer.parseInt(tempset1Vainqueur);
+
+		String tempset2Vainqueur = request.getParameter("set2vainqueur");
+		Integer set2Vainqueur = Integer.parseInt(tempset2Vainqueur);
+
+		String tempset1Finaliste = request.getParameter("set1finaliste");
+		Integer set1Finaliste = Integer.parseInt(tempset1Finaliste);
+
+		String tempset2Finaliste = request.getParameter("set2finaliste");
+		Integer set2Finaliste = Integer.parseInt(tempset2Finaliste);
+
+		// pour les set3, 4 et 5 qui peuvent être null on récupère en String la valeur
+		// dans le formulaire mais on la parse pas tout de suite en Integer
+		// ici tres important, si l'utilisateur ne renseigne rien dans les champs (que j'ai expres mis en non requiered dans la jsp pour les set 3, set 4 et set 5)
+		// cela va récupéer la valeur "" en faisant getParameter
+		String tempset3Vainqueur = request.getParameter("set3vainqueur");
+		String tempset4Vainqueur = request.getParameter("set4vainqueur");
+		String tempset5Vainqueur = request.getParameter("set5vainqueur");
+		String tempset3Finaliste = request.getParameter("set3finaliste");
+		String tempset4Finaliste = request.getParameter("set4finaliste");
+		String tempset5Finaliste = request.getParameter("set5finaliste");
+
+		// on appele la méthode pour convertir notre valeur du set en valeur en cohérence avec le format de la bdd
+		Integer set1 = getScoreSetForBDD(set1Vainqueur, set1Finaliste);
+		Integer set2 = getScoreSetForBDD(set2Vainqueur, set2Finaliste);
+		Integer set3;
+		Integer set4;
+		Integer set5;
+
+		// on va tester si l'utilisateur a ajouté qqchose pour les sets 3, 4 et 5
+		// comme le formulaire renvoie un string vide on teste avec .equals, si c'est
+		// egal c'est qu'il n'y a pas eu de set renseigné
+		// on pourrait prendre tempset3Vainqueur aussi
+
+		// si pas de set 3, pas de set 4 ni 5
+		if (tempset3Finaliste.equals("")) {
+			set3 = null;
+			set4 = null;
+			set5 = null;
+
+			// ensuite si le set 3 n'était pas vide mais le set 4 l'est on rentre dans le
+			// cas suivant : on transforme en Integer les valeurs récupérées de set3 pour
+			// leur appliquer la méthode
+		} else if (tempset4Finaliste.equals("")) {
+			Integer set3Vainqueur = Integer.parseInt(tempset3Vainqueur);
+			Integer set3Finaliste = Integer.parseInt(tempset3Finaliste);
+			set3 = getScoreSetForBDD(set3Vainqueur, set3Finaliste);
+			set4 = null;
+			set5 = null;
+
+			// ensuite si le set 4 n'était pas vide mais le set 5 l'est on rentre dans le
+			// cas suivant : on transforme en Integer les valeurs récupérées de set 3 et
+			// set4 pour leur appliquer la méthode
+		} else if (tempset5Finaliste.equals("")) {
+			Integer set3Vainqueur = Integer.parseInt(tempset3Vainqueur);
+			Integer set3Finaliste = Integer.parseInt(tempset3Finaliste);
+			set3 = getScoreSetForBDD(set3Vainqueur, set3Finaliste);
+			Integer set4Vainqueur = Integer.parseInt(tempset4Vainqueur);
+			Integer set4Finaliste = Integer.parseInt(tempset4Finaliste);
+			set4 = getScoreSetForBDD(set4Vainqueur, set4Finaliste);
+			set5 = null;
+
+			// le else correspond au cas où tous les sets ont été renseignés
+		} else {
+			Integer set3Vainqueur = Integer.parseInt(tempset3Vainqueur);
+			Integer set3Finaliste = Integer.parseInt(tempset3Finaliste);
+			set3 = getScoreSetForBDD(set3Vainqueur, set3Finaliste);
+			Integer set4Vainqueur = Integer.parseInt(tempset4Vainqueur);
+			Integer set4Finaliste = Integer.parseInt(tempset4Finaliste);
+			set4 = getScoreSetForBDD(set4Vainqueur, set4Finaliste);
+			Integer set5Vainqueur = Integer.parseInt(tempset5Vainqueur);
+			Integer set5Finaliste = Integer.parseInt(tempset5Finaliste);
+			set5 = getScoreSetForBDD(set5Vainqueur, set5Finaliste);
+		}
+
+		// on instancie unn objet score avec un constructeur vide
+		Score score = new Score();
+
+		// on ajoute les données récupérées dans notre objet score via les setters de la classe bean score
+		score.setIdMatch(idMatch);
+		score.setSet1(set1);
+		score.setSet2(set2);
+
+		// à partir du set3 on vérifie que la valeur est non nulle, si oui on ajoute la valeur à l'objet score, si elle est nulle on ne fait rien la valeur de l'attribut de la classe est nulle si elle n'a jamais été renseignée
+		if (set3 != null)
+			score.setSet3(set3);
+		if (set4 != null)
+			score.setSet4(set4);
+		if (set5 != null)
+			score.setSet5(set5);
+
+		// on appelle la méthode modifier pour update la table score avec les valeurs insérées dans notre objet score
+		scoreDao.modifier(score);
+
+		// on redirige l'utilisateur vers la lsite des matchs
 		response.sendRedirect("/Appljoueur/listmatch");
-		
-		
+
 	}
 
 	public List<Integer> getNbJeuxFromTableScore(Integer scoreSet) {
@@ -243,12 +350,12 @@ public class ModifierMatch extends HttpServlet {
 		Integer nbJeuxVainqueur;
 		Integer nbJeuxFinaliste;
 
-		if (scoreSet > 0 && scoreSet < 5) {
+		if (scoreSet >= 0 && scoreSet < 5) {
 			nbJeuxVainqueur = 6;
 			nbJeuxFinaliste = scoreSet;
 			listeNbJeuxJoueurs.add(nbJeuxVainqueur);
 			listeNbJeuxJoueurs.add(nbJeuxFinaliste);
-		} else if (scoreSet > 0 && scoreSet >= 5) {
+		} else if (scoreSet >= 0 && scoreSet >= 5) {
 			nbJeuxVainqueur = 7;
 			nbJeuxFinaliste = scoreSet;
 			listeNbJeuxJoueurs.add(nbJeuxVainqueur);
@@ -265,6 +372,14 @@ public class ModifierMatch extends HttpServlet {
 			listeNbJeuxJoueurs.add(nbJeuxFinaliste);
 		}
 		return listeNbJeuxJoueurs;
+	}
+
+	// méthode qui permet de récupérer la valeur du set à mettre dans la bdd (en
+	// cohérence) à partir du nb de jeux du finaliste et du vainqueur récupéré du
+	// formulaire
+	public int getScoreSetForBDD(int setVainqueur, int setFinaliste) {
+		return setVainqueur > setFinaliste ? setFinaliste : -setVainqueur;
+
 	}
 
 }
