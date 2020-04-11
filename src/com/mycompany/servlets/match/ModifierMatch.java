@@ -75,113 +75,121 @@ public class ModifierMatch extends HttpServlet {
 		request.setAttribute("idMatch", idMatch);
 		System.out.println("idmatch récupéré dans le doGet" + idMatch);
 
-		// avec l'idmatch récupéré on veut récupérer toute la ligne correspondante à cet
-		// id dans la table match, on enferme cette ligne dans un objet Match retourné
-		// par la méthode lecture
-		Match match = matchDao.lecture(idMatch);
-		// on récupère le contenu de la colonne id_Epreuve de la ligne sélectionée match
-		// précédente
-		int idEpreuve = match.getId_Epreuve();
+		if (request.getParameter("action").equals("Modifier")) {
 
-		// maintenant qu'on a l'id epreuve correspondant au macth sélectionné, on peut
-		// récupérer la ligne dans la table epreuve correspondante à l'id epreuve
-		// récupéré
-		Epreuve epreuve = epreuveDao.lecture(idEpreuve);
-		// les infos contenues dans cette ligne sont l'année,le type et l'idtournoi du
-		// macth sélectionnné
-		// on attribue l'objet epreuve à une variable afin de pouvoir afficher l'année
-		// récupérée dans la jsp avec value='${epreuve.annee}'
-		// pour le type, la varibale epreuve va permettre d'afficher le type
-		// correspondant au macth en préselection : <option value="F" <c:if
-		// test="${epreuve.type == 'F'}" >selected</c:if>>Femme</option>
-		request.setAttribute("epreuve", epreuve);
+			// avec l'idmatch récupéré on veut récupérer toute la ligne correspondante à cet
+			// id dans la table match, on enferme cette ligne dans un objet Match retourné
+			// par la méthode lecture
+			Match match = matchDao.lecture(idMatch);
+			// on récupère le contenu de la colonne id_Epreuve de la ligne sélectionée match
+			// précédente
+			int idEpreuve = match.getId_Epreuve();
 
-		// on va vouloir afficher le nom du tournoi correspondant donc on récupère
-		// l'id_tournoi via l'objet epreuve
-		int idTournoi = epreuve.getIdTournoi();
+			// maintenant qu'on a l'id epreuve correspondant au macth sélectionné, on peut
+			// récupérer la ligne dans la table epreuve correspondante à l'id epreuve
+			// récupéré
+			Epreuve epreuve = epreuveDao.lecture(idEpreuve);
+			// les infos contenues dans cette ligne sont l'année,le type et l'idtournoi du
+			// macth sélectionnné
+			// on attribue l'objet epreuve à une variable afin de pouvoir afficher l'année
+			// récupérée dans la jsp avec value='${epreuve.annee}'
+			// pour le type, la varibale epreuve va permettre d'afficher le type
+			// correspondant au macth en préselection : <option value="F" <c:if
+			// test="${epreuve.type == 'F'}" >selected</c:if>>Femme</option>
+			request.setAttribute("epreuve", epreuve);
 
-		// on récupère la liste de tous les tournois à afficher dans le champ nomtournoi
-		// via un foreach <c:forEach var="tournoi" items="${tournois}">
-		request.setAttribute("tournois", tournoiDao.lister());
+			// on va vouloir afficher le nom du tournoi correspondant donc on récupère
+			// l'id_tournoi via l'objet epreuve
+			int idTournoi = epreuve.getIdTournoi();
 
-		// on récupère la ligne dans la table tournoi qui correspond au match
-		// sélectionné
-		Tournoi tournoi = tournoiDao.lecture(idTournoi);
-		// c'est cette id qui va nous permettre de sélectionner le bon nom du tournoi à
-		// afficher quand l'utilisateur arrivera sur la page modifier grâce à la
-		// comparaison de cette id avec toutes les id de la liste
-		// <option value="${tournoi.id}" <c:if test="${tournoi.id == tournoiIdSelected}"
-		// >selected</c:if>>${tournoi.nom}</option>
-		request.setAttribute("tournoiIdSelected", tournoi.getId());
+			// on récupère la liste de tous les tournois à afficher dans le champ nomtournoi
+			// via un foreach <c:forEach var="tournoi" items="${tournois}">
+			request.setAttribute("tournois", tournoiDao.lister());
 
-		// on s'occupe du champ joueur à présent
-		// on commence par récupérer l'id vainqueur et l'id finaliste du match à
-		// modifier
-		long idVainqueur = match.getId_Vainqueur();
-		long idFinaliste = match.getId_Finaliste();
-		System.out.println("idvainqueur est " + idVainqueur);
-		System.out.println("idfinaoiste est " + idFinaliste);
+			// on récupère la ligne dans la table tournoi qui correspond au match
+			// sélectionné
+			Tournoi tournoi = tournoiDao.lecture(idTournoi);
+			// c'est cette id qui va nous permettre de sélectionner le bon nom du tournoi à
+			// afficher quand l'utilisateur arrivera sur la page modifier grâce à la
+			// comparaison de cette id avec toutes les id de la liste
+			// <option value="${tournoi.id}" <c:if test="${tournoi.id == tournoiIdSelected}"
+			// >selected</c:if>>${tournoi.nom}</option>
+			request.setAttribute("tournoiIdSelected", tournoi.getId());
 
-		// on appelle la méthode joueur.lecture pour récupérer la ligne correspondante à
-		// l'idVainqueur dans la table joueur et on fait de meme pour l'idFinalsite
-		Joueur joueurVainqueur = joueurDao.lecture(idVainqueur);
-		Joueur joueurFinaliste = joueurDao.lecture(idFinaliste);
+			// on s'occupe du champ joueur à présent
+			// on commence par récupérer l'id vainqueur et l'id finaliste du match à
+			// modifier
+			long idVainqueur = match.getId_Vainqueur();
+			long idFinaliste = match.getId_Finaliste();
+			System.out.println("idvainqueur est " + idVainqueur);
+			System.out.println("idfinaoiste est " + idFinaliste);
 
-		// on récupère la liste de tous les joueurs à afficher dans le champ finaliste
-		// et vainqueur via un foreach <c:forEach var="joueur" items="${joueurs}">
-		request.setAttribute("joueurs", joueurDao.lister());
+			// on appelle la méthode joueur.lecture pour récupérer la ligne correspondante à
+			// l'idVainqueur dans la table joueur et on fait de meme pour l'idFinalsite
+			Joueur joueurVainqueur = joueurDao.lecture(idVainqueur);
+			Joueur joueurFinaliste = joueurDao.lecture(idFinaliste);
 
-		// c'est cette id qui va nous permettre de sélectionner le bon nom du joueur à
-		// afficher quand l'utilisateur arrivera sur la page modifier grâce à la
-		// comparaison de cette id avec toutes les id de la liste
-		// <option value="${joueur.id}" <c:if test="${joueur.id == vainqueurIdSelected}"
-		// >selected</c:if>>${joueur.nom}</option>
-		request.setAttribute("vainqueurIdSelected", joueurVainqueur.getId());
-		request.setAttribute("finalisteIdSelected", joueurFinaliste.getId());
+			// on récupère la liste de tous les joueurs à afficher dans le champ finaliste
+			// et vainqueur via un foreach <c:forEach var="joueur" items="${joueurs}">
+			request.setAttribute("joueurs", joueurDao.lister());
 
-		// next step : afficher le score du match à modifier
-		// on récupère la ligne de la table score correspondant au match à modifier
-		// (donc avec l'idmatch) et la méthode lecture
-		Score score = scoreDao.lecture(idMatch);
+			// c'est cette id qui va nous permettre de sélectionner le bon nom du joueur à
+			// afficher quand l'utilisateur arrivera sur la page modifier grâce à la
+			// comparaison de cette id avec toutes les id de la liste
+			// <option value="${joueur.id}" <c:if test="${joueur.id == vainqueurIdSelected}"
+			// >selected</c:if>>${joueur.nom}</option>
+			request.setAttribute("vainqueurIdSelected", joueurVainqueur.getId());
+			request.setAttribute("finalisteIdSelected", joueurFinaliste.getId());
 
-		// on crée une méthode pour récupérer le nombre de jeux gagnés par les joueurs
-		// pour chaque set à partir du score récupéré de la bdd pour chaque set
-		// cette méthode nous renvoie une liste avec en premier parametre le nombre de
-		// jeux gagnés par le vainqueur et en deuxieme parametre le nb de jeux gagnés
-		// par le finaliste
-		Integer nbJeuxSet1Vainqueur = getNbJeuxFromTableScore(score.getSet1()).get(0);
-		Integer nbJeuxSet1Finaliste = getNbJeuxFromTableScore(score.getSet1()).get(1);
-		// on attribue cette valeur à une variable pour l'afficher dans la jsp avec
-		// value="${nbjeuxSet1Finaliste}"
-		request.setAttribute("nbjeuxSet1Vainqueur", nbJeuxSet1Vainqueur);
-		request.setAttribute("nbjeuxSet1Finaliste", nbJeuxSet1Finaliste);
+			// next step : afficher le score du match à modifier
+			// on récupère la ligne de la table score correspondant au match à modifier
+			// (donc avec l'idmatch) et la méthode lecture
+			Score score = scoreDao.lecture(idMatch);
 
-		Integer nbJeuxSet2Vainqueur = getNbJeuxFromTableScore(score.getSet2()).get(0);
-		Integer nbJeuxSet2Finaliste = getNbJeuxFromTableScore(score.getSet2()).get(1);
-		// on attribue cette valeur à une variable pour l'afficher dans la jsp avec
-		// value="${nbjeuxSet1Finaliste}"
-		request.setAttribute("nbjeuxSet2Vainqueur", nbJeuxSet2Vainqueur);
-		request.setAttribute("nbjeuxSet2Finaliste", nbJeuxSet2Finaliste);
+			// on crée une méthode pour récupérer le nombre de jeux gagnés par les joueurs
+			// pour chaque set à partir du score récupéré de la bdd pour chaque set
+			// cette méthode nous renvoie une liste avec en premier parametre le nombre de
+			// jeux gagnés par le vainqueur et en deuxieme parametre le nb de jeux gagnés
+			// par le finaliste
+			Integer nbJeuxSet1Vainqueur = getNbJeuxFromTableScore(score.getSet1()).get(0);
+			Integer nbJeuxSet1Finaliste = getNbJeuxFromTableScore(score.getSet1()).get(1);
+			// on attribue cette valeur à une variable pour l'afficher dans la jsp avec
+			// value="${nbjeuxSet1Finaliste}"
+			request.setAttribute("nbjeuxSet1Vainqueur", nbJeuxSet1Vainqueur);
+			request.setAttribute("nbjeuxSet1Finaliste", nbJeuxSet1Finaliste);
 
-		if (!(score.getSet3() == null)) {
-			Integer nbJeuxSet3Vainqueur = getNbJeuxFromTableScore(score.getSet3()).get(0);
-			Integer nbJeuxSet3Finaliste = getNbJeuxFromTableScore(score.getSet3()).get(1);
-			request.setAttribute("nbjeuxSet3Vainqueur", nbJeuxSet3Vainqueur);
-			request.setAttribute("nbjeuxSet3Finaliste", nbJeuxSet3Finaliste);
-		} else if (!(score.getSet4() == null)) {
-			Integer nbJeuxSet4Vainqueur = getNbJeuxFromTableScore(score.getSet4()).get(0);
-			Integer nbJeuxSet4Finaliste = getNbJeuxFromTableScore(score.getSet4()).get(1);
-			request.setAttribute("nbjeuxSet4Vainqueur", nbJeuxSet4Vainqueur);
-			request.setAttribute("nbjeuxSet4Finaliste", nbJeuxSet4Finaliste);
-		} else if (!(score.getSet5() == null)) {
-			Integer nbJeuxSet5Vainqueur = getNbJeuxFromTableScore(score.getSet5()).get(0);
-			Integer nbJeuxSet5Finaliste = getNbJeuxFromTableScore(score.getSet5()).get(1);
-			request.setAttribute("nbjeuxSet4Vainqueur", nbJeuxSet5Vainqueur);
-			request.setAttribute("nbjeuxSet4Finaliste", nbJeuxSet5Finaliste);
-		}
+			Integer nbJeuxSet2Vainqueur = getNbJeuxFromTableScore(score.getSet2()).get(0);
+			Integer nbJeuxSet2Finaliste = getNbJeuxFromTableScore(score.getSet2()).get(1);
+			// on attribue cette valeur à une variable pour l'afficher dans la jsp avec
+			// value="${nbjeuxSet1Finaliste}"
+			request.setAttribute("nbjeuxSet2Vainqueur", nbJeuxSet2Vainqueur);
+			request.setAttribute("nbjeuxSet2Finaliste", nbJeuxSet2Finaliste);
 
-		// on affiche la vue mise à jour avec les variables
-		this.getServletContext().getRequestDispatcher("/WEB-INF/modifiermatch.jsp").forward(request, response);
+			if (!(score.getSet3() == null)) {
+				Integer nbJeuxSet3Vainqueur = getNbJeuxFromTableScore(score.getSet3()).get(0);
+				Integer nbJeuxSet3Finaliste = getNbJeuxFromTableScore(score.getSet3()).get(1);
+				request.setAttribute("nbjeuxSet3Vainqueur", nbJeuxSet3Vainqueur);
+				request.setAttribute("nbjeuxSet3Finaliste", nbJeuxSet3Finaliste);
+			} else if (!(score.getSet4() == null)) {
+				Integer nbJeuxSet4Vainqueur = getNbJeuxFromTableScore(score.getSet4()).get(0);
+				Integer nbJeuxSet4Finaliste = getNbJeuxFromTableScore(score.getSet4()).get(1);
+				request.setAttribute("nbjeuxSet4Vainqueur", nbJeuxSet4Vainqueur);
+				request.setAttribute("nbjeuxSet4Finaliste", nbJeuxSet4Finaliste);
+			} else if (!(score.getSet5() == null)) {
+				Integer nbJeuxSet5Vainqueur = getNbJeuxFromTableScore(score.getSet5()).get(0);
+				Integer nbJeuxSet5Finaliste = getNbJeuxFromTableScore(score.getSet5()).get(1);
+				request.setAttribute("nbjeuxSet4Vainqueur", nbJeuxSet5Vainqueur);
+				request.setAttribute("nbjeuxSet4Finaliste", nbJeuxSet5Finaliste);
+			}
+
+			// on affiche la vue mise à jour avec les variables
+			this.getServletContext().getRequestDispatcher("/WEB-INF/modifiermatch.jsp").forward(request, response);
+			
+			 //si le bouton modifier n'a pas �t� cliqu� c'est qu'on a appuy� sur supprimer
+		} else {
+//			joueurDao.supprimer(id1);
+//			response.sendRedirect("/Appljoueur/listjoueur");
+		}		
 	}
 
 	/**
@@ -259,7 +267,8 @@ public class ModifierMatch extends HttpServlet {
 
 		// pour les set3, 4 et 5 qui peuvent être null on récupère en String la valeur
 		// dans le formulaire mais on la parse pas tout de suite en Integer
-		// ici tres important, si l'utilisateur ne renseigne rien dans les champs (que j'ai expres mis en non requiered dans la jsp pour les set 3, set 4 et set 5)
+		// ici tres important, si l'utilisateur ne renseigne rien dans les champs (que
+		// j'ai expres mis en non requiered dans la jsp pour les set 3, set 4 et set 5)
 		// cela va récupéer la valeur "" en faisant getParameter
 		String tempset3Vainqueur = request.getParameter("set3vainqueur");
 		String tempset4Vainqueur = request.getParameter("set4vainqueur");
@@ -268,7 +277,8 @@ public class ModifierMatch extends HttpServlet {
 		String tempset4Finaliste = request.getParameter("set4finaliste");
 		String tempset5Finaliste = request.getParameter("set5finaliste");
 
-		// on appele la méthode pour convertir notre valeur du set en valeur en cohérence avec le format de la bdd
+		// on appele la méthode pour convertir notre valeur du set en valeur en
+		// cohérence avec le format de la bdd
 		Integer set1 = getScoreSetForBDD(set1Vainqueur, set1Finaliste);
 		Integer set2 = getScoreSetForBDD(set2Vainqueur, set2Finaliste);
 		Integer set3;
@@ -324,12 +334,15 @@ public class ModifierMatch extends HttpServlet {
 		// on instancie unn objet score avec un constructeur vide
 		Score score = new Score();
 
-		// on ajoute les données récupérées dans notre objet score via les setters de la classe bean score
+		// on ajoute les données récupérées dans notre objet score via les setters de la
+		// classe bean score
 		score.setIdMatch(idMatch);
 		score.setSet1(set1);
 		score.setSet2(set2);
 
-		// à partir du set3 on vérifie que la valeur est non nulle, si oui on ajoute la valeur à l'objet score, si elle est nulle on ne fait rien la valeur de l'attribut de la classe est nulle si elle n'a jamais été renseignée
+		// à partir du set3 on vérifie que la valeur est non nulle, si oui on ajoute la
+		// valeur à l'objet score, si elle est nulle on ne fait rien la valeur de
+		// l'attribut de la classe est nulle si elle n'a jamais été renseignée
 		if (set3 != null)
 			score.setSet3(set3);
 		if (set4 != null)
@@ -337,7 +350,8 @@ public class ModifierMatch extends HttpServlet {
 		if (set5 != null)
 			score.setSet5(set5);
 
-		// on appelle la méthode modifier pour update la table score avec les valeurs insérées dans notre objet score
+		// on appelle la méthode modifier pour update la table score avec les valeurs
+		// insérées dans notre objet score
 		scoreDao.modifier(score);
 
 		// on redirige l'utilisateur vers la lsite des matchs
