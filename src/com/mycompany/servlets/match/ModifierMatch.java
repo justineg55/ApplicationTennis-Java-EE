@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.mycompany.beans.Epreuve;
 import com.mycompany.beans.Joueur;
@@ -64,6 +65,12 @@ public class ModifierMatch extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		HttpSession session=request.getSession(true);
+		if(session.getAttribute("connectedUser")==null) {
+			response.sendRedirect("/Appljoueur/login");
+			return;
+		}
+		
 		// on récupère l'id caché du match que l'utilisateur souhaite modifier
 		// balise <input type="hidden" name="idmatch" value="${ match.id }" /> à ajouter
 		// dans la jsp listmatch

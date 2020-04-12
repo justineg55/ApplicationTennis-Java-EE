@@ -81,14 +81,17 @@ public class ListMatch extends HttpServlet {
 			}
 			//on récupère ce que l'utilisateur a inscrit dans la barre de recherche
 			String search=request.getParameter("txtsearch");
+			//on appelle la méthode rechercher qui permet d'appliquer le filtre demandé par l'utilisateur, elle nosu renvoie une liste de type matchs
 			List <Match> matchsAfterSearchFilter=matchDao.rechercher(search);
+			//ce qu'on affiche à l'utilisateur c'est une liste de matchs mais au format matchUIO donc il faut qu'on applique une méthode qui permet de transformer notre liste de match apres le filtre recherche en une liste de type matchUio 
 			try {
+				//on attribue à la varibale matchs notre liste de type matchUIO que nous retourne la méthode ci dessous dans matchService
 				request.setAttribute("matchs", matchService.getMacthsUiofromASpecificMatchsList(matchsAfterSearchFilter));
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 			
-			//on fait pas un sendredirect ici car sinon ca rappelle la méthode lister() et donc tous les joueurs, on veut seulement afficher la liste qu'on a récupéré avec la recherche
+			//on fait pas un sendredirect ici car sinon ca rappelle la méthode lister() et donc tous les matchs sans le filtre recherche, on veut seulement afficher la liste qu'on a récupéré avec la recherche
 			this.getServletContext().getRequestDispatcher("/WEB-INF/listmatch.jsp").forward(request,response);
 			
 		} else if (request.getParameter("action1").equals("Deconnexion")){

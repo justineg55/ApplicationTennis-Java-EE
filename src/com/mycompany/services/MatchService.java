@@ -63,6 +63,7 @@ public class MatchService {
 		
 	}
 	
+	//on crée une autre méthode qui prend une liste en parametre pour transformer notre liste de matchs qu'on récupère aprés avoir utilisé la fonction recherche en liste de type match UIO pour afficher les matchs à l'utilisateur apres qu'il ait fait sa recherche
 public List<MatchUio> getMacthsUiofromASpecificMatchsList(List <Match> matchs) throws SQLException{
 		
 		//on initialise la liste matchUio qu'on va renvoyer à la fin quand elle sera complétée
