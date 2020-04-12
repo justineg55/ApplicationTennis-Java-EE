@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.Uio.MatchUio;
+import com.mycompany.beans.Joueur;
 import com.mycompany.beans.Match;
 import com.mycompany.beans.Tournoi;
 
@@ -309,7 +310,23 @@ public class MatchDaoImpl implements MatchDao {
 
 	@Override
 	public void supprimer(int id) {
-		// TODO Auto-generated method stub
+		Connection connexion = null;
+		PreparedStatement statement = null;
+
+		try {
+
+			connexion = daoFactory.getConnection();
+			// requete pour supprimer : DELETE FROM NOMDELATABLE WHERE ID=?, on supprime par l'id
+			statement = connexion.prepareStatement("DELETE FROM MATCH_TENNIS WHERE ID=?");
+			statement.setInt(1, id);
+
+			// quand il s'agit de supprimer, c'est aussi un executeUpdate()
+			statement.executeUpdate();
+			System.out.println("match supprimme");
+			
+		} catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
 
 	}
 
@@ -343,8 +360,43 @@ public class MatchDaoImpl implements MatchDao {
 
 	@Override
 	public List<Match> rechercher(String chaine) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<Match> matchs = new ArrayList<>();
+		Connection connexion = null;
+		PreparedStatement statement = null;
+
+		try {
+			connexion = daoFactory.getConnection();
+			
+		
+		String strSql="select * from match_tennis inner join epreuve on epreuve.ID = match_tennis.ID_EPREUVE inner join tournoi on epreuve.ID_TOURNOI = tournoi.ID inner join joueur on joueur.ID in (match_tennis.ID_VAINQUEUR, match_tennis.ID_FINALISTE ) inner join score_vainqueur on score_vainqueur.ID_MATCH = match_tennis.ID where joueur.NOM LIKE ? or joueur.PRENOM LIKE ? OR tournoi.NOM LIKE ? or epreuve.ANNEE LIKE ? OR epreuve.TYPE_EPREUVE LIKE ? or score_vainqueur.SET_1 LIKE ? OR score_vainqueur.SET_2 LIKE ? or score_vainqueur.SET_3  LIKE ? or score_vainqueur.SET_4 LIKE ? OR score_vainqueur.SET_5 LIKE ?";
+	
+		statement=connexion.prepareStatement(strSql);
+		
+		statement.setString(1, "%"+ chaine+ "%");
+		statement.setString(2, "%"+ chaine+ "%");
+		statement.setString(3, "%"+ chaine+ "%");
+		statement.setString(4, "%"+ chaine+ "%");
+		statement.setString(5, "%"+ chaine+ "%");
+		statement.setString(6, "%"+ chaine+ "%");
+		statement.setString(7, "%"+ chaine+ "%");
+		statement.setString(8, "%"+ chaine+ "%");
+		statement.setString(9, "%"+ chaine+ "%");
+		statement.setString(10, "%"+ chaine+ "%");
+		
+		ResultSet rs = statement.executeQuery();
+
+		while (rs.next()) {
+			Match match = new Match(rs.getInt("id"), rs.getInt("id_epreuve"), rs.getInt("id_vainqueur"),
+					rs.getInt("id_finaliste"));
+			matchs.add(match);
+			System.out.println("fonction recherché a marché");
+		}
+	} catch (Exception exception) {
+		throw new RuntimeException(exception);
+	}
+	return matchs;
+				
 	}
 
 	// méthode pour afficher le score :

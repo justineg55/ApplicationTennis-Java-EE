@@ -187,8 +187,26 @@ public class ModifierMatch extends HttpServlet {
 			
 			 //si le bouton modifier n'a pas �t� cliqu� c'est qu'on a appuy� sur supprimer
 		} else {
-//			joueurDao.supprimer(id1);
-//			response.sendRedirect("/Appljoueur/listjoueur");
+			//on appelle la méthode lecture pour récupéréer les id de la table match tennis correspondant à l'épreuve et aux joueurs
+			Match match = matchDao.lecture(idMatch);
+			
+			//on récupère l'id Epreuve qui correspond au match à supprimer (colonne idEpreuve de match)
+			int idEpreuve=match.getId_Epreuve();
+			
+		
+			//il faut supprimer dans la table score la ligne qui contient l'id match du match à supprimer
+			//il faut supprimer le score avant le match car score est lié à la table match par idmatch, on ne pourra pas supprimer le match avant le score car id match n'existerait plus dans score
+			scoreDao.supprimer(idMatch);
+			
+			//ensuite on peut supprimer le match car on a supprimé la ligne score en rapport avec ce match dans la table score 
+			//on supprime pas les joueurs du match à supprimmer car ils peuvent être utilisés pour plusieurs matchs
+			//on appelle la méthode supprimer de matchDaoImpl
+			matchDao.supprimer(idMatch);
+			
+			//c'est seulement après avoir supprimé le match qu'on supprime l'epreuve car idepreuve est contenue dans match donc on ne pourra pas supprimer epreuve avant d'avoir supprimé le match  
+			epreuveDao.supprimer(idEpreuve);
+			
+			response.sendRedirect("/Appljoueur/listmatch");
 		}		
 	}
 

@@ -59,7 +59,7 @@ public class ModifierTournoi extends HttpServlet {
 			request.setAttribute("tournoi", tournoi);
 			this.getServletContext().getRequestDispatcher("/WEB-INF/modifiertournoi.jsp").forward(request, response);
 		} else {
-			// si le bouton modifier n'a pas �t� cliqu� c'est qu'on a appuy� sur supprimer
+			// si le bouton modifier n'a pas ete clique c'est qu'on a appuye sur supprimer
 			tournoiDao.supprimer(id2);
 			response.sendRedirect("/Appljoueur/listtournoi");
 		}

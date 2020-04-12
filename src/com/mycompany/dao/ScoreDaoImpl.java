@@ -123,7 +123,22 @@ public class ScoreDaoImpl implements ScoreDao{
 
 	@Override
 	public void supprimer(int id) {
-		// TODO Auto-generated method stub
+		Connection connexion = null;
+		PreparedStatement statement = null;
+
+		try {
+
+			connexion = daoFactory.getConnection();
+			// on supprimer par l'idMatch pour supprimer tous les scores en rapport avec le match à supprimer
+			statement = connexion.prepareStatement("DELETE FROM SCORE_VAINQUEUR WHERE ID_MATCH=?");
+			statement.setLong(1, id);
+
+			// quand il s'agit de supprimer, c'est aussi un executeUpdate()
+			statement.executeUpdate();
+			System.out.println("score supprimé");
+		} catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
 		
 	}
 

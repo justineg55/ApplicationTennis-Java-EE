@@ -41,7 +41,6 @@ public class EpreuveDaoImpl implements EpreuveDao {
 			try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
 				if (generatedKeys.next()) {
 					epreuve.setId(generatedKeys.getInt(1));
-					System.out.println(epreuve.getId());
 				} else {
 					throw new SQLException("Creating epreuve failed, no ID obtained.");
 				}
@@ -77,7 +76,22 @@ public class EpreuveDaoImpl implements EpreuveDao {
 
 	@Override
 	public void supprimer(int id) {
-		// TODO Auto-generated method stub
+		Connection connexion = null;
+		PreparedStatement statement = null;
+
+		try {
+
+			connexion = daoFactory.getConnection();
+			// requete pour supprimer : DELETE FROM NOMDELATABLE WHERE ID=?, on supprime par l'id
+			statement = connexion.prepareStatement("DELETE FROM EPREUVE WHERE ID=?");
+			statement.setInt(1, id);
+
+			// quand il s'agit de supprimer, c'est aussi un executeUpdate()
+			statement.executeUpdate();
+			System.out.println("epreuve supprime");
+		} catch (Exception exception) {
+			throw new RuntimeException(exception);
+		}
 
 	}
 
